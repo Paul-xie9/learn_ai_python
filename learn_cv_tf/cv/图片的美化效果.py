@@ -248,8 +248,8 @@ imgInfo = img.shape
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 dst = np.zeros(imgInfo, np.uint8)
 collect = np.zeros(9, np.uint8)
-for i in range(1, height-1):
-    for j in range(1, width-1):
+for i in range(1, height - 1):
+    for j in range(1, width - 1):
         k = 0
         for m in range(-1, 2):
             for n in range(-1, 2):
@@ -258,8 +258,8 @@ for i in range(1, height-1):
                 k += 1
         for k in range(0, 9):
             p1 = collect[k]
-            for t in range(k+1, 9):
-                if p1 <collect[t]:
+            for t in range(k + 1, 9):
+                if p1 < collect[t]:
                     mid = collect[t]
                     collect[t] = p1
                     p1 = mid
