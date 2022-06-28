@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-Path = '/filehome/PythonProjects/learn_ai_python/image/lenna.png'
+Path = '/learn_cv_tf/resource/image/lenna.png'
 newImageInfo = (500, 500, 3)
 dst = np.zeros(newImageInfo, np.uint8)
 # ==========================绘制线段===============================

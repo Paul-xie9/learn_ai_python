@@ -1,6 +1,6 @@
 import cv2
 
-image_path = '/filehome/PythonProjects/learn_ai_python/image/videoImage/'
+image_path = '/learn_cv_tf/resource/image/videoImage/'
 # 视频分解图片
 # 1 加载；2 获取视频信息；3 解码取到单帧视频； 4 展示或者写入
 multiplePeoples_Path = '/filehome/PythonProjects/learn_ai_python/video/multiple_peoples.mp4'

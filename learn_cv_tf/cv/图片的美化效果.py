@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from image import myInImageUtils
+from learn_cv_tf.resource.image import myInImageUtils
 import numpy as np
 import cv2
 

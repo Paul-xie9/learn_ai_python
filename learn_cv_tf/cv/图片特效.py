@@ -4,7 +4,7 @@ import random
 import cv2
 import numpy as np
 
-filePath = '/filehome/PythonProjects/learn_ai_python/image/lenna.png'
+filePath = '/learn_cv_tf/resource/image/lenna.png'
 # ==================灰度化========================
 '''
 1.  cv2.imread读取的时候设置值

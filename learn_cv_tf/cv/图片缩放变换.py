@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-img = cv2.imread('/filehome/PythonProjects/learn_ai_python/image/lenna.png', 1)
+img = cv2.imread('/learn_cv_tf/resource/image/lenna.png', 1)
 imgInfo = img.shape
 height = imgInfo[0]
 width = imgInfo[1]
