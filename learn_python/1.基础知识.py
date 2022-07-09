@@ -26,4 +26,5 @@ def while_learn():
             message = input("Enter 'q' to end the program.")
 
 
-
+if __name__ == '__main__':
+    input_learn()
