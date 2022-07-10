@@ -1,3 +1,6 @@
+import random
+
+import numpy as np
 import tensorflow.compat.v1 as tf
 
 
@@ -104,5 +107,100 @@ def mytest():
     print("[3,2]的张量与7相乘的结果=>", result[1])
 
 
+# sigmoid激活函数将线性问题处理为非线性问题
+def sigmoidTest():
+    # 输入层
+    x = tf.placeholder(dtype=tf.float32)
+    # 目标值
+    yTrain = tf.placeholder(dtype=tf.float32)
+    # 隐藏层
+    w = tf.Variable(tf.zeros([3]), dtype=tf.float32)
+    # 加入偏移量加快训练速度
+    b = tf.Variable(80, dtype=tf.float32)
+    wn = tf.nn.softmax(w)
+    n1 = wn * x
+    n2 = tf.reduce_sum(n1) - b
+    # sigmoid激活函数
+    y = tf.nn.sigmoid(n2)
+    loss = tf.abs(yTrain - y)
+    optimizer = tf.train.RMSPropOptimizer(0.1)
+    train = optimizer.minimize(loss)
+    init = tf.global_variables_initializer()
+    sess = tf.Session()
+    sess.run(init)
+    random.seed()  # 产生新的随机数种子
+    # 伪造数据
+    for i in range(5):
+        # 成绩范围 [60,100]
+        xData = [int(random.random() * 41 + 60), int(random.random() * 41 + 60), int(random.random() * 41 + 60)]
+        xAll = xData[0] * 0.6 + xData[1] * 0.3 + xData[2] * 0.1
+        if xAll >= 95:
+            yTrainData = 1
+        else:
+            yTrainData = 0
+        result = sess.run([train, x, yTrain, w, b, n2, y, loss], feed_dict={x: xData, yTrain: yTrainData})
+        print("[train, x, yTrain, w, b, n2, y, loss]=>[60,100]=> ", result)
+        # 优秀成绩范围 [93,100]
+        xData = [int(random.random() * 8 + 93), int(random.random() * 8 + 93), int(random.random() * 8 + 93)]
+        xAll = xData[0] * 0.6 + xData[1] * 0.3 + xData[2] * 0.1
+        if xAll >= 95:
+            yTrainData = 1
+        else:
+            yTrainData = 0
+        result = sess.run([train, x, yTrain, w, b, n2, y, loss], feed_dict={x: xData, yTrain: yTrainData})
+        print("[train, x, yTrain, w, b, n2, y, loss]=>[93,100]=> ", result)
+        print()
+
+
+# 批量生产随机数
+def createMultiple():
+    random.seed()
+    rowCount = 5
+    # np.full函数的作用是生成一个多维数组，并用预定的值来填充
+    xData = np.full(shape=(rowCount, 3), fill_value=0, dtype=np.float32)
+    yTrainData = np.full(shape=rowCount, fill_value=0, dtype=np.float32)
+    goodCount = 0
+    # 生产随机训练的数据
+    for i in range(rowCount):
+        xData[i][0] = int(random.random() * 11 + 90)
+        xData[i][1] = int(random.random() * 11 + 90)
+        xData[i][2] = int(random.random() * 11 + 90)
+        xAll = xData[i][0] * 0.6 + xData[i][1] * 0.3 + xData[i][2] * 0.1
+        if xAll >= 95:
+            yTrainData[i] = 1
+            # goodCount用来记录符合三好学生条件的数据的个数
+            goodCount += 1
+        else:
+            yTrainData[i] = 0
+    print("xData=> ", xData)
+    print("yTrainData=> ", yTrainData)
+    print("goodCount=> ", goodCount)
+    x = tf.placeholder(dtype=tf.float32)
+    yTrain = tf.placeholder(dtype=tf.float32)
+    w = tf.Variable(tf.zeros([3]), dtype=tf.float32)
+    b = tf.Variable(80, dtype=tf.float32)
+    wn = tf.nn.softmax(w)
+    n1 = wn * x
+    n2 = tf.reduce_sum(n1) - b
+    y = tf.nn.sigmoid(n2)
+    loss = tf.abs(yTrain - y)
+    optimizer = tf.train.RMSPropOptimizer(0.1)
+    train = optimizer.minimize(loss)
+    sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
+    for i in range(2):
+        for j in range(rowCount):
+            result = sess.run([train, x, yTrain, wn, b, n2, y, loss], feed_dict={x: xData[j], yTrain: yTrainData[j]})
+            print("[train,x,yTrain,wn,b,n2,y,loss]=> ", result)
+
+
+# 从外部文件中批量读取训练数据
+def extensionFile():
+    filePath = "./file/data.txt"
+    # np.loadtxt()第一个参数代表要读取的文件名，命名参数delimiter表示数据项之间用什么字符分隔，命名参数dtype表示读取的数据类型
+    wholeData = np.loadtxt(filePath, delimiter=",", dtype=np.float32)
+    print(wholeData)
+
+
 if __name__ == '__main__':
-    mytest()
+    extensionFile()
