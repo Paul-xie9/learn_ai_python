@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 import tensorflow.compat.v1 as tf
+import pandas as pd
 
 
 # 最初版
@@ -202,5 +203,82 @@ def extensionFile():
     print(wholeData)
 
 
+# 利用pandas处理带中文的字符串文件
+def pandasLoadFile(fileName):
+    fileName = './file/data.csv'
+    # 该函数中的命名参数header要传入None（这是Python中用来代表“没有”的一个特殊的值）
+    # 否则会把文件的第一行当表头文字来处理；命名参数usecols是一个用圆括号括起来的数字集合，代表希望读取每一行中的哪一些列，
+    fileData = pd.read_csv(fileName, dtype=np.float32, header=None, usecols=(1, 2, 3, 4))
+    wholeData = fileData.values
+    print(wholeData)
+    return wholeData
+
+
+# 从外部引入数据训练
+def extensionDataCNN():
+    data = pandasLoadFile(None)
+    rowCount = int(data.size / data[0].size)
+    goodCount = 0
+    for i in range(rowCount):
+        if data[i][0] * 0.6 + data[i][1] * 0.3 + data[i][2] * 0.1 >= 95:
+            goodCount += 1
+    print("data=>", data)
+    print("rowCount=>", rowCount)
+    print("goodCount=>", goodCount)
+    # 输入层
+    x = tf.placeholder(dtype=tf.float32)
+    # 目标值
+    yTrain = tf.placeholder(dtype=tf.float32)
+    # 隐藏层
+    w = tf.Variable(tf.zeros([3]), dtype=tf.float32)
+    # 加入偏移量加快训练速度
+    b = tf.Variable(80, dtype=tf.float32)
+    wn = tf.nn.softmax(w)
+    n1 = wn * x
+    n2 = tf.reduce_sum(n1) - b
+    # sigmoid激活函数
+    y = tf.nn.sigmoid(n2)
+    loss = tf.abs(yTrain - y)
+    optimizer = tf.train.RMSPropOptimizer(0.1)
+    train = optimizer.minimize(loss)
+    init = tf.global_variables_initializer()
+    sess = tf.Session()
+    sess.run(init)
+    for i in range(2):
+        for j in range(rowCount):
+            result = sess.run([train, x, yTrain, wn, b, n2, y, loss], feed_dict={x: data[j][0:3], yTrain: data[j][3]})
+            print("result", result)
+
+
+# 判断身份证性别（单层神经网络）
+def identityGender():
+    x = tf.placeholder(tf.float32)
+    yTrain = tf.placeholder(tf.float32)
+    # 可变参数w
+    # random_normal函数产生的随机数是符合数学中正态分布的概率的,mean是指定这个平均值的，stddev是指定这个波动范围的
+    w = tf.Variable(tf.random_normal([4], mean=0.5, stddev=0.1), dtype=tf.float32)
+    # 偏移量b
+    b = tf.Variable(0, dtype=tf.float32)
+    n1 = w * x + b
+    y = tf.nn.sigmoid(tf.reduce_sum(n1))
+    loss = tf.abs(y - yTrain)
+    optimizer = tf.train.RMSPropOptimizer(0.01)
+    train = optimizer.minimize(loss)
+    sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
+    # lossSum变量来记录训练中误差的总和
+    lossSum = 0.0
+    for i in range(100000):
+        xDataRandom = [int(random.random() * 10), int(random.random() * 10), int(random.random() * 10),
+                       int(random.random() * 10)]
+        if xDataRandom[2] % 2 == 0:
+            yTrainDataRandom = 0
+        else:
+            yTrainDataRandom = 1
+        result = sess.run([train, x, yTrain, y, loss], feed_dict={x: xDataRandom, yTrain: yTrainDataRandom})
+        lossSum = lossSum + float(result[len(result) - 1])
+        print("i: %d, loss: %10.10f, avgLoss: %10.10f" % (i, float(result[len(result) - 1]), lossSum / (i + 1)))
+
+
 if __name__ == '__main__':
-    extensionFile()
+    identityGender()
